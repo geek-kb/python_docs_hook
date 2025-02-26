@@ -1,0 +1,8 @@
+---
+- id: python-docs
+  name: Python Documentation Generator
+  description: Automatically generates documentation for Python files
+  entry: python-docs-hook
+  language: python
+  types: [python]
+  require_serial: true
