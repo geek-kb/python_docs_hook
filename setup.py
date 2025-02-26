@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='python_docs_hook',  # Changed from hyphen to underscore
-    version='0.1.9',
+    version='0.1.10',
     description='A pre-commit hook to generate Python documentation',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
