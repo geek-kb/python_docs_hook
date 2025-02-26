@@ -47,32 +47,37 @@ def extract_docstrings(filename: str) -> Dict:
     return docs
 
 def generate_markdown(filename: str, docs: Dict) -> str:
-    """Generate markdown documentation from docstrings.
-
-    Args:
-        filename: Name of the source file
-        docs: Dictionary containing extracted documentation
-
-    Returns:
-        Formatted markdown string
-    """
+    """Generate markdown documentation from docstrings."""
     content = []
     base_filename = os.path.basename(filename)
     content.append(f"## {base_filename}\n")
-    logger.debug(f"Generating markdown for {base_filename}")
-
+    
     if docs['module']:
         content.append(f"{docs['module']}\n")
-        logger.debug("Added module documentation")
 
     if docs['functions']:
         content.append("### Functions\n")
         for func_name, func_info in docs['functions'].items():
+            # Function signature
             args = ', '.join(func_info['args'])
             content.append(f"#### `{func_name}({args})`\n")
+            
+            # Function documentation
             if func_info['docstring']:
-                content.append(f"{func_info['docstring']}\n")
-            logger.debug(f"Added documentation for function: {func_name}")
+                # Split docstring into parts
+                docstring = func_info['docstring'].strip()
+                parts = docstring.split('\n\n')
+                
+                # Add description
+                if parts:
+                    content.append(f"{parts[0]}\n")
+                
+                # Add parameters and returns sections
+                for part in parts[1:]:
+                    if part.strip().startswith(('Args:', 'Returns:', 'Raises:')):
+                        content.append(f"{part}\n")
+            
+            content.append("")  # Add empty line between functions
 
     return '\n'.join(content)
 
