@@ -160,11 +160,7 @@ def update_readme(content: str, source_file: str, allowed_paths: Optional[List[s
         raise
 
 def main() -> int:
-    """Main function to process Python files and generate documentation.
-
-    Returns:
-        Exit code (0 for success, 1 for failure)
-    """
+    """Main function to process Python files and generate documentation."""
     parser = argparse.ArgumentParser(description='Generate Python documentation')
     parser.add_argument('filenames', nargs='*', help='Python files to process')
     parser.add_argument(
@@ -176,9 +172,22 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        logger.debug(f"Processing files: {args.filenames}")
+        logger.debug(f"Initial files: {args.filenames}")
         logger.debug(f"Documentation paths: {args.doc_paths}")
+        
+        # Get staged files from git if no files specified
+        if not args.filenames:
+            import subprocess
+            try:
+                result = subprocess.run(['git', 'diff', '--cached', '--name-only'], 
+                                     capture_output=True, text=True, check=True)
+                args.filenames = [f for f in result.stdout.splitlines() if f.endswith('.py')]
+                logger.debug(f"Found staged Python files: {args.filenames}")
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Error getting staged files: {e}")
+                return 1
 
+        # Process files
         for filename in args.filenames:
             if filename.endswith('.py'):
                 logger.info(f"Processing Python file: {filename}")
@@ -188,8 +197,5 @@ def main() -> int:
 
         return 0
     except Exception as e:
-        logger.error(f"Error processing files: {e}")
+        logger.error(f"Error processing files: {e}", exc_info=True)
         return 1
-
-if __name__ == '__main__':
-    exit(main())
